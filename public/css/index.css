@@ -1,4 +1,4 @@
-html, body 
+html, body
 {
 	padding: 0px;
 	color: #fff;
@@ -26,7 +26,7 @@ html, body
 	position: relative;
 	display: inline-block;
 	background: transparent;
-	background-image: url(g/grid.png);
+	background-image: url(../img/grid.png);
 }
 
 #paper svg
@@ -145,19 +145,19 @@ Node styles
 .node input[type="text"], button
 {
 	/* Enable interacting with inputs only. */
-	pointer-events: auto;	
+	pointer-events: auto;
 	border: none;
 	box-sizing: border-box;
 	background-color: #456;
 	color: #fff;
-   
+
 }
 
 
 .node input[type="actor"]
 {
 	/* Enable interacting with inputs only. */
-	pointer-events: auto;	
+	pointer-events: auto;
 	border: none;
 	box-sizing: border-box;
 	background-color: #456;
@@ -173,7 +173,7 @@ Node styles
 .node input[type="choice"]
 {
 	/* Enable interacting with inputs only. */
-	pointer-events: auto;	
+	pointer-events: auto;
 	border: none;
 	box-sizing: border-box;
 	background-color: #456;
@@ -186,15 +186,15 @@ Node styles
 }
 
 
-.node textarea 
+.node textarea
 {
     	/* Enable interacting with inputs only. */
-	pointer-events: auto;	
+	pointer-events: auto;
 	border: none;
 	box-sizing: border-box;
 	background-color: #456;
 	color: #fff;
-    
+
 
 
 }
@@ -258,7 +258,7 @@ button.delete:hover
 	width: 100%;
 	padding: 4px;
 	margin-top: 2px;
- 
+
 }
 
 
