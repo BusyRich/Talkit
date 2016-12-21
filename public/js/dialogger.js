@@ -27,7 +27,7 @@ var defaultLink = new joint.dia.Link(
 	attrs:
 	{
 		'.marker-target .marker-source': {
-      fill: 'black',
+      stroke: 'black',
       d: 'M 10 0 L 0 5 L 10 10 z'
     }
 		//'.link-tools .tool-remove circle, .marker-vertex': { r: 8 },
@@ -65,102 +65,39 @@ var allowableConnections =
 
 
 //#endregion
-
-function validateConnection(cellViewS, magnetS, cellViewT, magnetT, end, linkView)
-{
-	// Prevent loop linking
-	if (magnetS == magnetT)
-		return false;
-
-	if (cellViewS == cellViewT)
-		return false;
-
-	if (magnetT.attributes.magnet.nodeValue !== 'passive') // Can't connect to an output port
-		return false;
-
-	var sourceType = cellViewS.model.attributes.type;
-	var targetType = cellViewT.model.attributes.type;
-	var valid = false;
-	for (var i = 0; i < allowableConnections.length; i++)
-	{
-		var rule = allowableConnections[i];
-		if (sourceType == rule[0] && targetType == rule[1])
-		{
-			valid = true;
-			break;
-		}
-	}
-	if (!valid)
-		return false;
-
-    //COMENTED UNTIL I FIGURE WHY IT "DANCES" WHEN SNAPPIN
-	//var links = graph.getConnectedLinks(cellViewS.model);
-	//for (var i = 0; i < links.length; i++)
-	//{
-	//	var link = links[i];
-	//	if (link.attributes.source.id === cellViewS.model.id && link.attributes.source.port === magnetS.attributes.port.nodeValue && link.attributes.target.id)
-	//	{
-	//		var targetCell = graph.getCell(link.attributes.target.id);
-	//		if (targetCell.attributes.type !== targetType)
-	//			return false; // We can only connect to multiple targets of the same type
-	//		if (targetCell == cellViewT.model)
-	//			return false; // Already connected
-	//	}
-	//}
-
-	return true;
-}
-
-function validateMagnet(cellView, magnet)
-{
-	if (magnet.getAttribute('magnet') === 'passive')
-		return false;
-
-	// If unlimited connections attribute is null, we can only ever connect to one object
-	// If it is not null, it is an array of type strings which are allowed to have unlimited connections
-	var unlimitedConnections = magnet.getAttribute('unlimitedConnections');
-	var links = graph.getConnectedLinks(cellView.model);
-	for (var i = 0; i < links.length; i++)
-	{
-		var link = links[i];
-		if (link.attributes.source.id === cellView.model.id && link.attributes.source.port === magnet.attributes.port.nodeValue)
-		{
-			// This port already has a connection
-			if (unlimitedConnections && link.attributes.target.id)
-			{
-				var targetCell = graph.getCell(link.attributes.target.id);
-				if (unlimitedConnections.indexOf(targetCell.attributes.type) !== -1)
-					return true; // It's okay because this target type has unlimited connections
-			}
-			return false;
-		}
-	}
-
-	return true;
-}
-
 joint.shapes.dialogue = {};
 
 //#region Dialog.BASE
-joint.shapes.dialogue.Base = joint.shapes.devs.Model.extend(
-{
-	defaults: joint.util.deepSupplement
-	(
-		{
-			type: 'dialogue.Base',
-			size: { width: 250, height: 135 },
-			name: '',
-			attrs:
-			{
-				rect: { stroke: 'none', 'fill-opacity': 0 },
-				text: { display: 'none' },
-				'.inPorts circle': { magnet: 'passive' },
-				'.outPorts circle': { magnet: true, },
-			},
-		},
-		joint.shapes.devs.Model.prototype.defaults
-	),
-});
+joint.shapes.dialogue.Base = joint.shapes.devs.Model.extend({
+	defaults: joint.util.deepSupplement({
+		type: 'dialogue.Base',
+		size: {
+      width: 250,
+      height: 250
+    },
+		name: '',
+    inPorts: ['in1'],
+    outPorts: ['out1'],
+    ports: {
+      groups: {
+        'in': { position: 'top'},
+        'out': { position: 'bottom' }
+      }
+    },
+		attrs: {
+      '.': { magnet: false },
+			rect: { stroke: 'none', 'fill-opacity': 0 },
+			text: { display: 'none' },
+			'.inPorts circle': {
+        magnet: 'passive'
+      },
+			'.outPorts circle': {
+        magnet: true
+      }
+		}
+	},
+	joint.shapes.devs.Model.prototype.defaults
+)});
 //#endregion
 
 var baseTpl = $('#baseTpl');
@@ -168,9 +105,11 @@ function getTemplate(elmId) {
   return baseTpl.clone().html().replace('%CONTENT%', $('#' + elmId).html());
 }
 
+
 //#region BaseView
-joint.shapes.dialogue.BaseView = joint.shapes.devs.ModelView.extend(
-{
+joint.shapes.devs.ModelView = joint.dia.ElementView.extend(joint.shapes.basic.PortsViewInterface);
+
+joint.shapes.dialogue.BaseView = joint.shapes.devs.ModelView.extend({
 	template: getTemplate('textTpl'),
 	initialize: function()
 	{
@@ -258,7 +197,7 @@ joint.shapes.dialogue.BaseView = joint.shapes.devs.ModelView.extend(
 //#endregion
 
 //#region ChoiceView
-joint.shapes.dialogue.ChoiceView = joint.shapes.devs.ModelView.extend(
+joint.shapes.dialogue.ChoiceView = joint.shapes.dialogue.BaseView.extend(
 {
     template: getTemplate('choiceTpl'),
     initialize: function () {
@@ -799,8 +738,6 @@ var paper = new joint.dia.Paper(
 	model: graph,
 	gridSize: 16,
 	defaultLink: defaultLink,
-	validateConnection: validateConnection,
-	validateMagnet: validateMagnet,
 	// Enable link snapping within 75px lookup radius
 	snapLinks: { radius: 75 }
 
