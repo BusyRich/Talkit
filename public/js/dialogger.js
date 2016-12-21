@@ -26,8 +26,11 @@ var defaultLink = new joint.dia.Link(
 {
 	attrs:
 	{
-		'.marker-target': { d: 'M 10 0 L 0 5 L 10 10 z', },
-		'.link-tools .tool-remove circle, .marker-vertex': { r: 8 },
+		'.marker-target .marker-source': {
+      fill: 'black',
+      d: 'M 10 0 L 0 5 L 10 10 z'
+    }
+		//'.link-tools .tool-remove circle, .marker-vertex': { r: 8 },
 	},
 });
 
@@ -102,7 +105,7 @@ function validateConnection(cellViewS, magnetS, cellViewT, magnetT, end, linkVie
 	//			return false; // We can only connect to multiple targets of the same type
 	//		if (targetCell == cellViewT.model)
 	//			return false; // Already connected
-	//	} 
+	//	}
 	//}
 
 	return true;
@@ -128,7 +131,7 @@ function validateMagnet(cellView, magnet)
 				var targetCell = graph.getCell(link.attributes.target.id);
 				if (unlimitedConnections.indexOf(targetCell.attributes.type) !== -1)
 					return true; // It's okay because this target type has unlimited connections
-			} 
+			}
 			return false;
 		}
 	}
@@ -160,24 +163,17 @@ joint.shapes.dialogue.Base = joint.shapes.devs.Model.extend(
 });
 //#endregion
 
+var baseTpl = $('#baseTpl');
+function getTemplate(elmId) {
+  return baseTpl.clone().html().replace('%CONTENT%', $('#' + elmId).html());
+}
+
 //#region BaseView
 joint.shapes.dialogue.BaseView = joint.shapes.devs.ModelView.extend(
 {
-	template:
-	[
-		'<div class="node">',
-		'<span class="label"></span>',
-		'<button class="delete">x</button>',
-        '<input type="actor" class="actor" placeholder="Actor" />',
-		//'<input type="text" class="name" placeholder="Text" />',
-        '<p> <textarea type="text" class="name" rows="4" cols="27" placeholder="Speech"></textarea></p>',
-        '</div>',
-	].join(''),
-
+	template: getTemplate('textTpl'),
 	initialize: function()
 	{
-	  
-
 		_.bindAll(this, 'updateBox');
 		joint.shapes.devs.ModelView.prototype.initialize.apply(this, arguments);
 
@@ -227,7 +223,7 @@ joint.shapes.dialogue.BaseView = joint.shapes.devs.ModelView.extend(
 	{
 		// Set the position and dimension of the box so that it covers the JointJS element.
 	    var bbox = this.model.getBBox();
-       
+
 		// Example of updating the HTML with a data stored in the cell model.
 		var nameField = this.$box.find('input.name');
 		if (!nameField.is(':focus'))
@@ -264,17 +260,7 @@ joint.shapes.dialogue.BaseView = joint.shapes.devs.ModelView.extend(
 //#region ChoiceView
 joint.shapes.dialogue.ChoiceView = joint.shapes.devs.ModelView.extend(
 {
-    template:
-	[
-		'<div class="node">',
-		'<span class="label"> </span>',
-		'<button class="delete">x</button>',
-        '<input type="choice" class="title" placeholder="Title" />',
-        '<p> <textarea type="text" class="name" rows="4" cols="27" placeholder="Speech"></textarea></p>',
-		'</div>',
-        		
-	].join(''),
-
+    template: getTemplate('choiceTpl'),
     initialize: function () {
 
 
@@ -378,7 +364,7 @@ joint.shapes.dialogue.Text = joint.shapes.devs.Model.extend(
 			textarea: 'Start writing',
 			attrs:
 			{
-			  
+
 				'.outPorts circle': { unlimitedConnections: ['dialogue.Choice'], }
 			},
 		},
@@ -426,19 +412,10 @@ joint.shapes.dialogue.Branch = joint.shapes.devs.Model.extend(
 		joint.shapes.dialogue.Base.prototype.defaults
 	),
 });
+
 joint.shapes.dialogue.BranchView = joint.shapes.dialogue.BaseView.extend(
 {
-	template:
-	[
-		'<div class="node">',
-		'<span class="label"></span>',
-		'<button class="delete">x</button>',
-		'<button class="add">+</button>',
-		'<button class="remove">-</button>',
-		'<input type="text" class="name" placeholder="Variable" />',
-		'<input type="text" value="Default" readonly/>',
-		'</div>',
-	].join(''),
+	template: getTemplate('branchTpl'),
 
 	initialize: function()
 	{
@@ -539,15 +516,7 @@ joint.shapes.dialogue.Set = joint.shapes.devs.Model.extend(
 
 joint.shapes.dialogue.SetView = joint.shapes.dialogue.BaseView.extend(
 {
-	template:
-	[
-		'<div class="node">',
-		'<span class="label"></span>',
-		'<button class="delete">x</button>',
-		'<input type="text" class="name" placeholder="Variable" />',
-		'<input type="text" class="value" placeholder="Value" />',
-		'</div>',
-	].join(''),
+	template: getTemplate('setTpl'),
 
 	initialize: function()
 	{
@@ -567,7 +536,7 @@ joint.shapes.dialogue.SetView = joint.shapes.dialogue.BaseView.extend(
 	},
 });
 
-//#endregion 
+//#endregion
 
 function gameData()
 {
@@ -602,7 +571,7 @@ function gameData()
 				node.variable = cell.name;
 				node.value = cell.value;
 				node.next = null;
-                
+
 			}
 
 			else if (node.type == 'Choice') {
