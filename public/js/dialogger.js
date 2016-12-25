@@ -3,21 +3,8 @@ function getURLParameter(name) {
 }
 
 function onError(e) {
-    console.log('Error', e);
+  console.log('Error', e);
 }
-
-var fs = null;
-var loadOnStart = getURLParameter('load');
-var importOnStart = getURLParameter('import');
-
-addEventListener('app-ready', function(e)
-{
-	// We're running inside app.js
-	fs = require('fs');
-	$('#import').hide();
-	$('#export').hide();
-	$('#export-game').hide();
-});
 
 var graph = new joint.dia.Graph(),
     addNodePopup = $('#popupMenu');
@@ -632,151 +619,6 @@ function gameData()
 	return nodes;
 }
 
-
-// Menu actions
-
-var filename = null;
-var defaultFilename = 'dialogue.json';
-
-
-
-function flash(text)
-{
-	var $flash = $('#flash');
-	$flash.text(text);
-	$flash.stop(true, true);
-	$flash.show();
-	$flash.css('opacity', 1.0);
-	$flash.fadeOut({ duration: 1500 });
-}
-
-function offerDownload(name, data)
-{
-	var a = $('<a>');
-	a.attr('download', name);
-	a.attr('href', 'data:application/json,' + encodeURIComponent(JSON.stringify(data)));
-	a.attr('target', '_blank');
-	a.hide();
-	$('body').append(a);
-	a[0].click();
-	a.remove();
-}
-
-function promptFilename(callback)
-{
-	if (fs)
-	{
-		filename = null;
-		window.frame.openDialog(
-		{
-			type: 'save',
-		}, function(err, files)
-		{
-			if (!err && files.length == 1)
-			{
-				filename = files[0];
-				callback(filename);
-			}
-		});
-	}
-	else
-	{
-		filename = prompt('Filename', defaultFilename);
-		callback(filename);
-	}
-}
-
-function applyTextFields()
-{
-	$('input[type=text]').blur();
-}
-
-function save()
-{
-	applyTextFields();
-	if (!filename)
-		promptFilename(doSave);
-	else
-		doSave();
-}
-
-function doSave()
-{
-	if (filename)
-	{
-		if (fs)
-		{
-			fs.writeFileSync(filename, JSON.stringify(graph), 'utf8');
-			fs.writeFileSync(gameFilenameFromNormalFilename(filename), JSON.stringify(gameData()), 'utf8');
-		}
-		else
-		{
-			if (!localStorage[filename])
-				addFileEntry(filename);
-			localStorage[filename] = JSON.stringify(graph);
-		}
-		flash('Saved ' + filename);
-	}
-}
-
-function load()
-{
-    if (fs) {
-        /// AUTOLOAD
-        window.frame.openDialog(
-		{
-		    type: 'open',
-		    multiSelect: false,
-		}, function (err, files) {
-		    if (!err && files.length == 1) {
-		        graph.clear();
-		        filename = files[0];
-		        graph.fromJSON(JSON.parse(fs.readFileSync(filename, 'utf8')));
-		    }
-		});
-    }
-
-    else {
-
-        $('#menu').show();
-    }
-}
-
-function exportFile()
-{
-	if (!fs)
-	{
-		applyTextFields();
-		offerDownload(filename ? filename : defaultFilename, graph);
-	}
-}
-
-function gameFilenameFromNormalFilename(f)
-{
-    return f.substring(0, f.length - 2) + 'on';
-}
-
-function exportGameFile()
-{
-	if (!fs)
-	{
-		applyTextFields();
-		offerDownload(gameFilenameFromNormalFilename(filename ? filename : defaultFilename), gameData());
-	}
-}
-
-function importFile()
-{
-	if (!fs)
-		$('#file').click();
-}
-
-function clear()
-{
-	graph.clear();
-	filename = null;
-}
-
 // Browser stuff
 
 var paper = new joint.dia.Paper(
@@ -791,25 +633,18 @@ var paper = new joint.dia.Paper(
   interactive: false
 });
 
+// Paper Panning
 var panning = false;
 var mousePosition = { x: 0, y: 0 };
-paper.on('blank:pointerdown', function(e, x, y)
-{
+paper.on('blank:pointerdown', function(e, x, y) {
 	panning = true;
 	mousePosition.x = e.pageX;
 	mousePosition.y = e.pageY;
 	$('body').css('cursor', 'move');
-	applyTextFields();
-});
-paper.on('cell:pointerdown', function(e, x, y)
-{
-	applyTextFields();
 });
 
-$('#container').mousemove(function(e)
-{
-	if (panning)
-	{
+$('#container').mousemove(function(e) {
+	if(panning) {
 		var $this = $(this);
 		$this.scrollLeft($this.scrollLeft() + mousePosition.x - e.pageX);
 		$this.scrollTop($this.scrollTop() + mousePosition.y - e.pageY);
@@ -818,110 +653,22 @@ $('#container').mousemove(function(e)
 	}
 });
 
-$('#container').mouseup(function (e)
-{
+$('#container').mouseup(function (e) {
 	panning = false;
 	$('body').css('cursor', 'default');
 });
 
-function handleFiles(files)
-{
-	filename = files[0].name;
-	var fileReader = new FileReader();
-	fileReader.onload = function(e)
-	{
-		graph.clear();
-		graph.fromJSON(JSON.parse(e.target.result));
-	};
-	fileReader.readAsText(files[0]);
+function cancelEvent(evt) {
+  evt.stopPropagation();
+	evt.preventDefault();
 }
-
-$('#file').on('change', function()
-{
-	handleFiles(this.files);
-});
-
-$('body').on('dragenter', function(e)
-{
-	e.stopPropagation();
-	e.preventDefault();
-});
-
-$('body').on('dragexit', function(e)
-{
-	e.stopPropagation();
-	e.preventDefault();
-});
-
-$('body').on('dragover', function(e)
-{
-	e.stopPropagation();
-	e.preventDefault();
-});
-
-$('body').on('drop', function(e)
-{
-	e.stopPropagation();
-	e.preventDefault();
-	handleFiles(e.originalEvent.dataTransfer.files);
-});
-
-
 
 $(window).resize(function() {
-	applyTextFields();
 	var $window = $(window);
 	var $container = $('#container');
-		$container.height($window.innerHeight());
-		$container.width($window.innerWidth());
-		var $menu = $('#menu');
-		$menu.css('top', Math.max(0, (($window.height() - $menu.outerHeight()) / 2)) + 'px');
-		$menu.css('left', Math.max(0, (($window.width() - $menu.outerWidth()) / 2)) + 'px');
-		return this;
-});
-
-function addFileEntry(name)
-{
-	var entry = $('<div>');
-	entry.text(name);
-	var deleteButton = $('<button class="delete">-</button>');
-	entry.append(deleteButton);
-	$('#menu').append(entry);
-
-	deleteButton.on('click', function(event)
-	{
-		localStorage.removeItem(name);
-		entry.remove();
-		event.stopPropagation();
-	});
-
-	entry.on('click', function(event)
-	{
-		graph.clear();
-		graph.fromJSON(JSON.parse(localStorage[name]));
-		filename = name;
-		$('#menu').hide();
-	});
-}
-
-(function()
-{
-	for (var i = 0; i < localStorage.length; i++)
-		addFileEntry(localStorage.key(i));
-})();
-
-$('#menu button.close').click(function() {
-	$('#menu').hide();
+	$container.height($window.innerHeight());
+	$container.width($window.innerWidth());
+	return this;
 });
 
 $(window).trigger('resize');
-
-///AUTOLOAD IF URL HAS ? WILDCARD
-if (loadOnStart != null) {
-    loadOnStart += '.json';
-    console.log(loadOnStart);
-    graph.clear();
-    filename = loadOnStart;
-    graph.fromJSON(JSON.parse(localStorage[loadOnStart]));
-    //graph.fromJSON(JSON.parse(fs.readFileSync(filename, 'utf8')));
-}
