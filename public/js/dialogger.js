@@ -19,55 +19,107 @@ addEventListener('app-ready', function(e)
 	$('#export-game').hide();
 });
 
-var graph = new joint.dia.Graph();
-
-//#region DefaultLinks
-var defaultLink = new joint.dia.Link(
-{
-	attrs:
-	{
-		'.marker-target .marker-source': {
-      stroke: 'black',
-      d: 'M 10 0 L 0 5 L 10 10 z'
-    }
-		//'.link-tools .tool-remove circle, .marker-vertex': { r: 8 },
-	},
-});
-
-
-defaultLink.set('smooth', true);
-
-var allowableConnections =
-[
-	['dialogue.Text', 'dialogue.Text'],
-	['dialogue.Text', 'dialogue.Node'],
-	['dialogue.Text', 'dialogue.Choice'],
-	['dialogue.Text', 'dialogue.Set'],
-	['dialogue.Text', 'dialogue.Branch'],
-	['dialogue.Node', 'dialogue.Text'],
-	['dialogue.Node', 'dialogue.Node'],
-	['dialogue.Node', 'dialogue.Choice'],
-	['dialogue.Node', 'dialogue.Set'],
-	['dialogue.Node', 'dialogue.Branch'],
-	['dialogue.Choice', 'dialogue.Text'],
-	['dialogue.Choice', 'dialogue.Node'],
-	['dialogue.Choice', 'dialogue.Set'],
-	['dialogue.Choice', 'dialogue.Branch'],
-	['dialogue.Set', 'dialogue.Text'],
-	['dialogue.Set', 'dialogue.Node'],
-	['dialogue.Set', 'dialogue.Set'],
-	['dialogue.Set', 'dialogue.Branch'],
-	['dialogue.Branch', 'dialogue.Text'],
-	['dialogue.Branch', 'dialogue.Node'],
-	['dialogue.Branch', 'dialogue.Set'],
-	['dialogue.Branch', 'dialogue.Branch'],
-];
-
+var graph = new joint.dia.Graph(),
+    addNodePopup = $('#popupMenu');
 
 //#endregion
 joint.shapes.dialogue = {};
 
-//#region Dialog.BASE
+_.templateSettings.interpolate = /{{([\s\S]+?)}}/g;
+var baseTpl = $('#baseTpl');
+function getTemplate(elmId) {
+  return baseTpl.clone().html().replace('%CONTENT%', $('#' + elmId).html());
+}
+
+//#region BaseView
+function dragOn(evt) {
+  this._dragging = true;
+  this._dragHandleOffset = evt.pageX - this._dragHandle.offset().left;
+}
+
+function dragOff() {
+  this._dragging = false;
+}
+
+function drag(evt) {
+  if(this._dragging) {
+    var position = this.model.position();
+
+    this.model.position(evt.pageX - this._dragHandleOffset, position.y);
+    //console.log(this.model.position());
+  }
+}
+
+var selectedNode,
+    nodePadding = {x: 50, y: 100};
+function showAddMenu(evt) {
+  var elm = $(this);
+  addNodePopup.css(elm.parent().offset()).slideDown(200);
+  selectedNode = graph.attributes.cells._byId[elm.parents('.node').attr('id')];
+  evt.preventDefault();
+}
+
+function add(type, source) {
+  var node, options = {
+    position: {
+      x: 0,
+      y: 20
+    }
+  };
+
+  if(selectedNode) {
+    options.position.y = selectedNode.attributes.position.y +
+      selectedNode.attributes.size.height + nodePadding.y;
+
+    var links = graph.getConnectedLinks(selectedNode, {outbound:true}),
+        farX = -1;
+
+    if(links && links.length > 0) {
+      var tmpLink;
+
+      links.forEach(function(link) {
+        tmpLink = graph.attributes.cells._byId[link.attributes.target.id];
+
+        if(farX < tmpLink.attributes.position.x) {
+          farX = tmpLink.attributes.position.x;
+          options.position.x = farX + tmpLink.attributes.size.width +
+            nodePadding.x;
+        }
+      });
+    } else {
+      options.position.x = selectedNode.attributes.position.x;
+    }
+  }
+
+  switch(type) {
+    case 'text':
+      node = new joint.shapes.dialogue.Text(options);
+  }
+
+  graph.addCells([node]);
+
+  if(graph.attributes.cells.length > 1) {
+    new joint.dia.Link({
+        source: { id: selectedNode.id, port: 'output' },
+        target: { id: node.id, port: 'input'},
+        attrs: {
+          '.marker-target': {d: 'M 20 0 L 0 10 L 20 20 z'}
+        }
+    }).addTo(graph);
+  } else if(graph.attributes.cells.length == 1) {
+    node.removePort('input');
+  }
+
+  lastNode = node;
+
+  addNodePopup.slideUp(100);
+}
+
+$('#popupMenu a').click(function(evt) {
+  add('text');
+  evt.preventDefault();
+});
+
 joint.shapes.dialogue.Base = joint.shapes.devs.Model.extend({
 	defaults: joint.util.deepSupplement({
 		type: 'dialogue.Base',
@@ -80,53 +132,59 @@ joint.shapes.dialogue.Base = joint.shapes.devs.Model.extend({
     outPorts: ['out1'],
     ports: {
       groups: {
-        'in': { position: 'top'},
-        'out': { position: 'bottom' }
+        'in': {
+          position: {
+            name: 'top',
+            args: {
+              dy: 12
+            }
+          }
+        },
+        'out': {
+          position: {
+            name: 'bottom',
+            args: {
+              dy: -12
+            }
+          }
+        }
       }
-    },
-		attrs: {
-      '.': { magnet: false },
-			rect: { stroke: 'none', 'fill-opacity': 0 },
-			text: { display: 'none' },
-			'.inPorts circle': {
-        magnet: 'passive'
-      },
-			'.outPorts circle': {
-        magnet: true
-      }
-		}
+    }
 	},
 	joint.shapes.devs.Model.prototype.defaults
 )});
-//#endregion
 
-var baseTpl = $('#baseTpl');
-function getTemplate(elmId) {
-  return baseTpl.clone().html().replace('%CONTENT%', $('#' + elmId).html());
-}
-
-
-//#region BaseView
 joint.shapes.devs.ModelView = joint.dia.ElementView.extend(joint.shapes.basic.PortsViewInterface);
 
 joint.shapes.dialogue.BaseView = joint.shapes.devs.ModelView.extend({
-	template: getTemplate('textTpl'),
+	template: 'textTpl',
+  icon: 'comment',
+  title: 'Dialog',
+  color: '#80CCFF',
 	initialize: function()
 	{
 		_.bindAll(this, 'updateBox');
 		joint.shapes.devs.ModelView.prototype.initialize.apply(this, arguments);
 
-		this.$box = $(_.template(this.template)());
-		// Prevent paper from handling pointerdown.
-		this.$box.find('input').on('mousedown click', function (evt) { evt.stopPropagation(); });
+		this.$box = $(_.template(baseTpl.html())({
+      id: this.model.id,
+      icon: this.icon,
+      color: this.color,
+      title: this.title,
+      content: $('#' + this.template).html()
+    }));
 
-	    // Prevent paper from handling pointerdown.
-		this.$box.find('textarea').on('mousedown click', function (evt) { evt.stopPropagation(); });
-
+    // Dragging Logic
+    this._dragging = false;
+    this._dragHandle = this.$box.find('.header');
+    this._dragHandleOffset = 0;
+    this._dragHandle
+      .mousedown(_.bind(dragOn, this))
+      .on('mouseup mouseout', _.bind(dragOff, this))
+      .mousemove(_.bind(drag, this));
 
 		// This is an example of reacting on the input change and storing the input data in the cell model.
-		this.$box.find('input.name').on('change', _.bind(function(evt)
-		{
+		this.$box.find('input.name').on('change', _.bind(function(evt) {
 			this.model.set('name', $(evt.target).val());
 		}, this));
 
@@ -135,13 +193,19 @@ joint.shapes.dialogue.BaseView = joint.shapes.devs.ModelView.extend({
 		    this.model.set('actor', $(evt.target).val());
 		}, this));
 
+    this.$box.find('.footer .add-node-single').click(showAddMenu);
+
 
 	    // This is an example of reacting on the input change and storing the input data in the cell model. TEXTAREA
 		this.$box.find('textarea.name').on('change', _.bind(function (evt) {
 		    this.model.set('name', $(evt.target).val());
 		}, this));
 
-		this.$box.find('.delete').on('click', _.bind(this.model.remove, this.model));
+		this.$box.find('.close').on('click', _.bind(function(evt) {
+        this.remove();
+        evt.preventDefault();
+      }, this.model));
+
 		// Update the box position whenever the underlying model changes.
 		this.model.on('change', this.updateBox, this);
 		// Remove the box when the model gets removed from the graph.
@@ -303,7 +367,6 @@ joint.shapes.dialogue.Text = joint.shapes.devs.Model.extend(
 			textarea: 'Start writing',
 			attrs:
 			{
-
 				'.outPorts circle': { unlimitedConnections: ['dialogue.Choice'], }
 			},
 		},
@@ -708,20 +771,6 @@ function importFile()
 		$('#file').click();
 }
 
-function add(constructor)
-{
-	return function()
-	{
-		var position = $('#cmroot').position();
-		var container = $('#container')[0];
-		var element = new constructor(
-		{
-			position: { x: position.left + container.scrollLeft, y: position.top + container.scrollTop },
-		});
-		graph.addCells([element]);
-	};
-}
-
 function clear()
 {
 	graph.clear();
@@ -737,10 +786,9 @@ var paper = new joint.dia.Paper(
 	height: 8000,
 	model: graph,
 	gridSize: 16,
-	defaultLink: defaultLink,
 	// Enable link snapping within 75px lookup radius
-	snapLinks: { radius: 75 }
-
+	snapLinks: { radius: 75 },
+  interactive: false
 });
 
 var panning = false;
@@ -818,37 +866,9 @@ $('body').on('drop', function(e)
 	handleFiles(e.originalEvent.dataTransfer.files);
 });
 
-$(window).on('keydown', function(event)
-{
-	// Catch Ctrl-S or key code 19 on Mac (Cmd-S)
-	if (((event.ctrlKey || event.metaKey) && String.fromCharCode(event.which).toLowerCase() == 's') || event.which == 19)
-	{
-		event.stopPropagation();
-		event.preventDefault();
-		save();
-		return false;
-	}
-	else if ((event.ctrlKey || event.metaKey) && String.fromCharCode(event.which).toLowerCase() == 'o')
-	{
-		event.stopPropagation();
-		event.preventDefault();
-		load();
-		return false;
-	}
-	else if ((event.ctrlKey || event.metaKey) && String.fromCharCode(event.which).toLowerCase() == 'e')
-	{
-		event.stopPropagation();
-		event.preventDefault();
-		exportFile();
-		return false;
-	}
-	return true;
-});
 
 
-
-$(window).resize(function()
-{
+$(window).resize(function() {
 	applyTextFields();
 	var $window = $(window);
 	var $container = $('#container');
@@ -890,38 +910,13 @@ function addFileEntry(name)
 		addFileEntry(localStorage.key(i));
 })();
 
-$('#menu button.close').click(function()
-{
+$('#menu button.close').click(function() {
 	$('#menu').hide();
 });
 
 $(window).trigger('resize');
 
-$('#paper').contextmenu(
-{
-	width: 150,
-	items:
-	[
-		{ text: 'Text', alias: '1-1', action: add(joint.shapes.dialogue.Text) },
-		{ text: 'Choice', alias: '1-2', action: add(joint.shapes.dialogue.Choice) },
-		{ text: 'Branch', alias: '1-3', action: add(joint.shapes.dialogue.Branch) },
-		{ text: 'Set', alias: '1-4', action: add(joint.shapes.dialogue.Set) },
-		{ text: 'Node', alias: '1-5', action: add(joint.shapes.dialogue.Node) },
-		{ type: 'splitLine' },
-		{ text: 'Save', alias: '2-1', action: save },
-		{ text: 'Load', alias: '2-2', action: load },
-		{ text: 'Import', id: 'import', alias: '2-3', action: importFile },
-		{ text: 'New', alias: '2-4', action: clear },
-		{ text: 'Export', id: 'export', alias: '2-5', action: exportFile },
-		{ text: 'Export game file', id: 'export-game', alias: '2-6', action: exportGameFile },
-	]
-});
-
-
-
-
 ///AUTOLOAD IF URL HAS ? WILDCARD
-
 if (loadOnStart != null) {
     loadOnStart += '.json';
     console.log(loadOnStart);
