@@ -627,9 +627,13 @@ var paper = new joint.dia.Paper(
 	width: 16000,
 	height: 8000,
 	model: graph,
-	gridSize: 16,
-	// Enable link snapping within 75px lookup radius
-	snapLinks: { radius: 75 },
+	gridSize: 8,
+  defaultRouter: {
+    name: 'manhattan',
+    args: {
+      step: 1
+    }
+  },
   interactive: false
 });
 
