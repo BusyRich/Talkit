@@ -1,5 +1,9 @@
 # Node Modules Folder
 node_modules
 
-#DS Store
+# DS Store
 .DS_Store
+
+# Compiled Files
+public/js/ditree.js
+public/js/ditree.min.js
