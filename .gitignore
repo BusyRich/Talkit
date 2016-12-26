@@ -7,3 +7,4 @@ node_modules
 # Compiled Files
 public/js/ditree.js
 public/js/ditree.min.js
+public/css/ditree.min.css
