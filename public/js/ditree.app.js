@@ -16,10 +16,8 @@ var selectedNode,
   nodePadding = { x: 50, y: 100 };
 
 function showAddMenu(evt) {
-  var elm = $(this),
+  var elm = $(evt.currentTarget),
       elmHeight = elm.height();
-
-  selectedNode = graph.attributes.cells._byId[elm.parents('.node').attr('id')];
 
   addNodePopup
     .removeClass('large')

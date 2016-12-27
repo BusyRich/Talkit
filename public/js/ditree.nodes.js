@@ -43,8 +43,6 @@ joint.shapes.ditree.Text = joint.shapes.devs.Model.extend({
   )
 });
 
-
-
 // View for text nodes.
 joint.shapes.ditree.TextView = joint.shapes.devs.DitreeBaseView.extend({
   template: 'textTpl',
@@ -89,7 +87,7 @@ joint.shapes.ditree.TextView = joint.shapes.devs.DitreeBaseView.extend({
       this.model.set('name', $(evt.target).val());
     }, this));
 
-    this.$box.find('.add-node').click(showAddMenu);
+    this.$box.find('.add-node').click(_.bind(this.showMenu, this));
 
     this.$box.find('.close').click(_.bind(this.close, this));
 
@@ -97,6 +95,12 @@ joint.shapes.ditree.TextView = joint.shapes.devs.DitreeBaseView.extend({
     this.model.on('change', this.update, this);
 
     this.update();
+  },
+
+  showMenu: function(evt) {
+    selectedNode = this.model;
+    this.model.set('selectedPort', $(evt.currentTarget).data('port'));
+    showAddMenu(evt);
   },
 
   dragOn: function(evt) {
