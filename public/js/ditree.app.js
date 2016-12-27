@@ -75,8 +75,14 @@ function add(type, source) {
 
   if (graph.attributes.cells.length > 1) {
     new joint.dia.Link({
-      source: { id: selectedNode.id, port: 'out1' },
-      target: { id: node.id, port: 'in1' },
+      source: { 
+        id: selectedNode.id, 
+        port: selectedNode.get('selectedPort') 
+      },
+      target: { 
+        id: node.id, 
+        port: 'in1'
+      },
       attrs: {
         '.marker-target': { d: 'M 20 0 L 0 10 L 20 20 z' }
       }

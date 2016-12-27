@@ -36,7 +36,8 @@ joint.shapes.ditree.Text = joint.shapes.devs.Model.extend({
             }
           }
         }
-      }
+      },
+      selectedPort: 'out1'
     },
     joint.shapes.devs.Model.prototype.defaults
   )
@@ -52,7 +53,7 @@ joint.shapes.ditree.TextView = joint.shapes.devs.DitreeBaseView.extend({
   color: '#80CCFF',
   _super: joint.shapes.devs.DitreeBaseView.prototype,
   initialize: function() {
-    _.bindAll(this, 'updateBox');
+    _.bindAll(this, 'update');
     this._super.initialize.apply(this, arguments);
 
     this.$box = $(_.template(joint.shapes.ditree.BaseMarkup.html())({
@@ -83,25 +84,19 @@ joint.shapes.ditree.TextView = joint.shapes.devs.DitreeBaseView.extend({
       this.model.set('actor', $(evt.target).val());
     }, this));
 
-    this.$box.find('.add-node').click(showAddMenu);
-
-
-    // This is an example of reacting on the input change and storing the input data in the cell model. TEXTAREA
+        // This is an example of reacting on the input change and storing the input data in the cell model. TEXTAREA
     this.$box.find('textarea.name').on('change', _.bind(function(evt) {
       this.model.set('name', $(evt.target).val());
     }, this));
 
-    this.$box.find('.close').on('click', _.bind(function(evt) {
-      this.remove();
-      evt.preventDefault();
-    }, this.model));
+    this.$box.find('.add-node').click(showAddMenu);
+
+    this.$box.find('.close').click(_.bind(this.close, this));
 
     // Update the box position whenever the underlying model changes.
-    this.model.on('change', this.updateBox, this);
-    // Remove the box when the model gets removed from the graph.
-    this.model.on('remove', this.removeBox, this);
+    this.model.on('change', this.update, this);
 
-    this.updateBox();
+    this.update();
   },
 
   dragOn: function(evt) {
@@ -125,11 +120,13 @@ joint.shapes.ditree.TextView = joint.shapes.devs.DitreeBaseView.extend({
   render: function() {
     this._super.render.apply(this, arguments);
     this.paper.$el.prepend(this.$box);
-    this.updateBox();
+    this.update();
     return this;
   },
 
-  updateBox: function() {
+  update: function() {
+    this._super.update.apply(this, arguments);
+
     // Set the position and dimension of the box so that it covers the JointJS element.
     var bbox = this.model.getBBox();
 
@@ -163,7 +160,9 @@ joint.shapes.ditree.TextView = joint.shapes.devs.DitreeBaseView.extend({
     });
   },
 
-  removeBox: function(evt) {
+  close: function(evt) {
+    this.model.remove();
     this.$box.remove();
+    evt.preventDefault();
   }
 });
