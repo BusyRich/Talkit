@@ -93,10 +93,8 @@ $placeholderColor: rgba(0, 0, 0, 0.3);
 
 #popupMenu {
   position: absolute;
-  width: 100px;
-  height: 48px;
-  right: 0;
-  top: 0;
+  right: 50%;
+  top: 50%;
   z-index: 9999;
   font-size: 24px;
 
@@ -104,12 +102,30 @@ $placeholderColor: rgba(0, 0, 0, 0.3);
 	  display: inline-block;
 	  float: left;
 	  width: 25%;
-	  height: 48px;
-	  line-height: 48px;
+	  height: 100%;
+	  line-height: inherit;
 	  text-align: center;
 	  color: rgba(255, 255, 255, 0.5);
 	  background-color: #ccc;
 	}
+}
+
+#popupMenu.large {
+	width: 400px;
+  height: 100px;
+  line-height: 100px;
+  margin: -50px -200px 0 0;
+  font-size: 40px;
+}
+
+#startText {
+	position: absolute;
+	width: 400px;
+	height: 100px;
+	right: 50%;
+	top: 50%;
+	margin: -150px -200px;
+	text-align: center;
 }
 
 /*

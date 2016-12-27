@@ -16,13 +16,21 @@ var selectedNode,
   nodePadding = { x: 50, y: 100 };
 
 function showAddMenu(evt) {
-  var elm = $(this);
+  var elm = $(this),
+      elmHeight = elm.height();
+
   selectedNode = graph.attributes.cells._byId[elm.parents('.node').attr('id')];
 
-  addNodePopup.css(elm.parent().offset())
-    .width(selectedNode.attributes.size.width)
+  addNodePopup
+    .removeClass('large')
+    .css({
+      width: selectedNode.attributes.size.width,
+      height: elmHeight,
+      lineHeight: elmHeight + 'px'
+    })
+    .css(elm.parent().offset())
     .slideDown(200);
-  
+
   evt.preventDefault();
 }
 
@@ -84,6 +92,8 @@ function add(type, source) {
 
 $('#popupMenu a').click(function(evt) {
   add('text');
+
+  $('#startText').hide();
   evt.preventDefault();
 });
 
