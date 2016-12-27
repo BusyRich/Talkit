@@ -72,20 +72,8 @@ joint.shapes.ditree.TextView = joint.shapes.devs.DitreeBaseView.extend({
       .on('mouseup mouseout', _.bind(this.dragOff, this))
       .mousemove(_.bind(this.drag, this));
 
-    // This is an example of reacting on the input change and storing the input data in the cell model.
-    this.$box.find('input.name').on('change', _.bind(function(evt) {
-      this.model.set('name', $(evt.target).val());
-    }, this));
-
-    // This is an example of reacting on the input change and storing the input data in the cell model.
-    this.$box.find('input.actor').on('change', _.bind(function(evt) {
-      this.model.set('actor', $(evt.target).val());
-    }, this));
-
-        // This is an example of reacting on the input change and storing the input data in the cell model. TEXTAREA
-    this.$box.find('textarea.name').on('change', _.bind(function(evt) {
-      this.model.set('name', $(evt.target).val());
-    }, this));
+    this.dataFields = this.$box.find('.data');
+    this.dataFields.on('change', _.bind(this.updateData, this));
 
     this.$box.find('.add-node').click(_.bind(this.showMenu, this));
 
@@ -128,33 +116,20 @@ joint.shapes.ditree.TextView = joint.shapes.devs.DitreeBaseView.extend({
     return this;
   },
 
+  updateData: function(evt) {
+    var tmpField;
+    for(var f = 0; f < this.dataFields.length; f++) {
+      tmpField = $(this.dataFields[f]);
+      this.model.set(tmpField.data('name'), tmpField.val());
+    }
+  },
+
   update: function() {
     this._super.update.apply(this, arguments);
-
+    
     // Set the position and dimension of the box so that it covers the JointJS element.
     var bbox = this.model.getBBox();
 
-    // Example of updating the HTML with a data stored in the cell model.
-    var nameField = this.$box.find('input.name');
-    if (!nameField.is(':focus'))
-      nameField.val(this.model.get('name'));
-
-    // Example of updating the HTML with a data stored in the cell model.
-    var actorField = this.$box.find('input.actor');
-    if (!actorField.is(':focus'))
-      actorField.val(this.model.get('actor'));
-
-    // Example of updating the HTML with a data stored in the cell model.
-    var textAreaField = this.$box.find('textarea.name');
-    if (!textAreaField.is(':focus'))
-      textAreaField.val(this.model.get('name'));
-
-    var label = this.$box.find('.label');
-    var type = this.model.get('type').slice('dialogue.'.length);
-    label.text(type);
-    label.attr('class', 'label ' + type);
-    //this.$box.css({ width: bbox.width, height: bbox.height, left: bbox.x, top: bbox.y,
-    //  transform: 'rotate(' + (this.model.get('angle') || 0) + 'deg)' });
     this.$box.css({
       width: bbox.width,
       height: bbox.height,
@@ -162,6 +137,8 @@ joint.shapes.ditree.TextView = joint.shapes.devs.DitreeBaseView.extend({
       top: bbox.y,
       transform: 'rotate(' + (this.model.get('angle') || 0) + 'deg)'
     });
+
+    this.updateData();
   },
 
   close: function(evt) {
