@@ -26,6 +26,22 @@ $placeholderColor: rgba(0, 0, 0, 0.3);
    color: $placeholderColor;  
 } 
 
+.noselect {
+	/* iOS Safari */
+  -webkit-touch-callout: none;
+  /* Chrome/Safari/Opera */
+  -webkit-user-select: none;
+  /* Konqueror */
+  -khtml-user-select: none;
+  /* Firefox */
+  -moz-user-select: none;
+  /* Internet Explorer/Edge */
+  -ms-user-select: none;
+  /* Non-prefixed version, 
+  used in most browsers. */
+  user-select: none;
+}
+
 #container {
   overflow: scroll;
 }

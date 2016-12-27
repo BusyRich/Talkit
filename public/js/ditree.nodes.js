@@ -105,18 +105,19 @@ joint.shapes.ditree.TextView = joint.shapes.devs.DitreeBaseView.extend({
   },
 
   dragOn: function(evt) {
+    this.$box.addClass('noselect');
     this._dragging = true;
     this._dragHandleOffset = evt.pageX - this._dragHandle.offset().left;
   },
 
   dragOff: function() {
     this._dragging = false;
+    this.$box.removeClass('noselect');
   },
 
   drag: function(evt) {
     if (this._dragging) {
       var position = this.model.position();
-
       this.model.position(evt.pageX - this._dragHandleOffset, position.y);
     }
   },
