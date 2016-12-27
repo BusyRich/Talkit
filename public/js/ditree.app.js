@@ -17,8 +17,12 @@ var selectedNode,
 
 function showAddMenu(evt) {
   var elm = $(this);
-  addNodePopup.css(elm.parent().offset()).slideDown(200);
   selectedNode = graph.attributes.cells._byId[elm.parents('.node').attr('id')];
+
+  addNodePopup.css(elm.parent().offset())
+    .width(selectedNode.attributes.size.width)
+    .slideDown(200);
+  
   evt.preventDefault();
 }
 

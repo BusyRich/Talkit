@@ -10,30 +10,32 @@
 		<script src="js/joint.min.js"></script>
 		<script src="https://use.fontawesome.com/82d9ef112e.js"></script>
 		<template id="baseTpl">
-			<div class="node" id="{{id}}" style="background-color:{{color}};">
+			<div class="node {{type}}" id="{{id}}" style="background-color:{{color}};">
 				<div class="header" >
 					<i class="icon fa fa-{{icon}}"></i>
 					<span class="node-title">{{title}}</span>
 					<span class="node-id">{{id}}</span>
 					<a href="#" class="close"><i class="fa fa-close"></i></a>
 				</div>
-		    <input type="actor" class="actor" placeholder="Actor"/>
-	    	<p class="node-content">
-					{{content}}
-				</p>
-				<div class="footer">
-					<a href="#" class="add-node-single">
-						<i class="fa fa-code-fork"></i>
-					</a>
-				</div>
+				{{content}}
 	    </div>
 		</template>
 		<template id="textTpl">
-			<textarea type="text" class="name" rows="4" cols="27" placeholder="Speech"></textarea>
+			<p class="node-content">
+				<label><i class="fa fa-user"></i> Actor</label>
+				<input type="actor" class="actor" placeholder="Name Here"/>
+				<label><i class="fa fa-comment"></i> Dialog</label>
+				<textarea type="text" class="name" placeholder="I should say something..."></textarea>
+			</p>
+			<div class="footer">
+				<a href="#" class="add-node" data-port="">
+					<i class="fa fa-code-fork"></i>
+				</a>
+			</div>
 		</template>
 		<template id="choiceTpl">
 			<input type="choice" class="title" placeholder="Title" />
-			<textarea type="text" class="name" rows="4" cols="27" placeholder="Speech"></textarea>
+			<textarea type="text" class="name" rows="4" cols="27" placeholder="I should say something..."></textarea>
 		</template>
 		<template id="branchTpl">
 			<button class="add">+</button>

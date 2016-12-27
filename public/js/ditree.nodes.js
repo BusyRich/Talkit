@@ -12,8 +12,8 @@ joint.shapes.ditree.Text = joint.shapes.devs.Model.extend({
   defaults: joint.util.deepSupplement({
       type: 'ditree.Text',
       size: {
-        width: 250,
-        height: 250
+        width: 320,
+        height: 305
       },
       inPorts: ['in1'],
       outPorts: ['out1'],
@@ -56,6 +56,7 @@ joint.shapes.ditree.TextView = joint.shapes.devs.DitreeBaseView.extend({
     this._super.initialize.apply(this, arguments);
 
     this.$box = $(_.template(joint.shapes.ditree.BaseMarkup.html())({
+      type: this.model.get('type').replace('.','-').toLowerCase(),
       id: this.model.id,
       icon: this.icon,
       color: this.color,
@@ -82,7 +83,7 @@ joint.shapes.ditree.TextView = joint.shapes.devs.DitreeBaseView.extend({
       this.model.set('actor', $(evt.target).val());
     }, this));
 
-    this.$box.find('.footer .add-node-single').click(showAddMenu);
+    this.$box.find('.add-node').click(showAddMenu);
 
 
     // This is an example of reacting on the input change and storing the input data in the cell model. TEXTAREA
