@@ -67,6 +67,10 @@ function add(type, source) {
   switch (type) {
     case 'text':
       node = new joint.shapes.ditree.Text(options);
+      break;
+    case 'skill':
+      node = new joint.shapes.ditree.Skill(options);
+      break;
   }
 
   graph.addCells([node]);
@@ -95,7 +99,7 @@ function add(type, source) {
 }
 
 $('#popupMenu a').click(function(evt) {
-  add('text');
+  add($(this).data('type'));
 
   $('#startText').hide();
   evt.preventDefault();

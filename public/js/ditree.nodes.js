@@ -31,7 +31,7 @@ joint.shapes.ditree.Text = joint.shapes.devs.Model.extend({
             position: {
               name: 'bottom',
               args: {
-                dy: -12
+                dy: 0
               }
             }
           }
@@ -146,4 +146,22 @@ joint.shapes.ditree.TextView = joint.shapes.devs.DitreeBaseView.extend({
     this.$box.remove();
     evt.preventDefault();
   }
+});
+
+joint.shapes.ditree.Skill = joint.shapes.devs.Model.extend({
+  defaults: joint.util.deepSupplement({
+    type: 'ditree.Skill',
+    size: {
+      width: 300,
+      height: 180
+    },
+    outPorts: ['out1','out2']
+  }, joint.shapes.ditree.Text.prototype.defaults)
+});
+
+joint.shapes.ditree.SkillView = joint.shapes.ditree.TextView.extend({
+  template: 'skillTpl',
+  icon: 'check-square-o',
+  title: 'Skill Check',
+  color: '#CCC'
 });

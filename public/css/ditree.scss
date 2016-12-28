@@ -245,12 +245,30 @@ $headerSize: 38px;
 	  bottom: 0;
 	  z-index: 1;
 	}
+
+	.add-node {
+	  display: block;
+	  height: 100%;
+	  font-size: 32px;
+	  text-align: center;
+	}
 }
 
 .ditree-text .add-node {
-  display: block;
   width: 100%;
-  height: 100%;
-  font-size: 32px;
-  text-align: center;
+}
+
+.ditree-skill {
+  .add-node {
+	  width: 50%;
+    float: left;
+  }
+
+  .footer a.success {
+    background-color: rgba(85, 170, 85, 0.6);
+  }
+
+  .footer a.failure {
+    background-color: rgba(212, 106, 106, 0.6);
+  }
 }
