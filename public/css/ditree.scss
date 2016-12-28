@@ -272,3 +272,25 @@ $headerSize: 38px;
     background-color: rgba(212, 106, 106, 0.6);
   }
 }
+
+.ditree-variable {
+  .variable-update-type {
+    height: 32px;
+    line-height: 32px;
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.4);
+
+    a {
+      display: inline-block;
+      width: 20%;
+      height: 100%;
+      float: left;
+      color: inherit;
+      text-decoration: none;
+    }
+
+    a.selected {
+      background-color: rgba(255, 255, 255, 0.4);
+    }
+  }
+}

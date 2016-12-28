@@ -71,6 +71,9 @@ function add(type, source) {
     case 'skill':
       node = new joint.shapes.ditree.Skill(options);
       break;
+    case 'variable':
+      node = new joint.shapes.ditree.Variable(options);
+      break;
   }
 
   graph.addCells([node]);

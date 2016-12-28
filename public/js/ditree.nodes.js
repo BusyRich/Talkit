@@ -54,6 +54,7 @@ joint.shapes.ditree.TextView = joint.shapes.devs.DitreeBaseView.extend({
     _.bindAll(this, 'update');
     this._super.initialize.apply(this, arguments);
 
+    // Create the node HTML element from the base template and the one provided.
     this.$box = $(_.template(joint.shapes.ditree.BaseMarkup.html())({
       type: this.model.get('type').replace('.','-').toLowerCase(),
       id: this.model.id,
@@ -72,19 +73,23 @@ joint.shapes.ditree.TextView = joint.shapes.devs.DitreeBaseView.extend({
       .on('mouseup mouseout', _.bind(this.dragOff, this))
       .mousemove(_.bind(this.drag, this));
 
+    // Bind the data fields to update the underlying model when changed.
     this.dataFields = this.$box.find('.data');
     this.dataFields.on('change', _.bind(this.updateData, this));
 
+    // Bind any "add node" buttons to showing the add new node menu.
     this.$box.find('.add-node').click(_.bind(this.showMenu, this));
 
+    // Bind the close button to remove this node.
     this.$box.find('.close').click(_.bind(this.close, this));
 
-    // Update the box position whenever the underlying model changes.
+    // Update the view whenever the underlying model changes.
     this.model.on('change', this.update, this);
 
     this.update();
   },
 
+  // Sets up and shows the "Add New Node" menu.
   showMenu: function(evt) {
     selectedNode = this.model;
     this.model.set('selectedPort', $(evt.currentTarget).data('port'));
@@ -116,7 +121,8 @@ joint.shapes.ditree.TextView = joint.shapes.devs.DitreeBaseView.extend({
     return this;
   },
 
-  updateData: function(evt) {
+  // Takes the values from the data fields and sets matching data on the model.
+  updateData: function() {
     var tmpField;
     for(var f = 0; f < this.dataFields.length; f++) {
       tmpField = $(this.dataFields[f]);
@@ -164,4 +170,36 @@ joint.shapes.ditree.SkillView = joint.shapes.ditree.TextView.extend({
   icon: 'check-square-o',
   title: 'Skill Check',
   color: '#CCC'
+});
+
+joint.shapes.ditree.Variable = joint.shapes.devs.Model.extend({
+  defaults: joint.util.deepSupplement({
+    type: 'ditree.Variable',
+    size: {
+      width: 300,
+      height: 400
+    },
+    outPorts: ['out1']
+  }, joint.shapes.ditree.Text.prototype.defaults)
+});
+
+joint.shapes.ditree.VariableView = joint.shapes.ditree.TextView.extend({
+  template: 'variableTpl',
+  icon: 'file-code-o',
+  title: 'Variable',
+  color: '#D4CB6A',
+  initialize: function() {
+    joint.shapes.ditree.TextView.prototype.initialize.apply(this, arguments);
+
+    this.typeLinks = this.$box.find('.variable-update-type a');
+    this.typeLinks.click(_.bind(this.changeType, this));
+  },
+
+  changeType: function(evt) {
+    this.typeLinks.removeClass('selected');
+
+    var tmpLink = $(evt.currentTarget).addClass('selected');
+    this.model.set('updateType', tmpLink.data('type'));
+    evt.preventDefault();
+  }
 });

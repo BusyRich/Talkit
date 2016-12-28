@@ -47,11 +47,28 @@
         </a>
       </div>
     </template>
-    <template id="branchTpl">
-      <button class="add">+</button>
-      <button class="remove">-</button>
-      <input type="text" class="name" placeholder="Variable" />
-      <input type="text" value="Default" readonly/>
+    <template id="variableTpl">
+      <div class="node-content">
+        <label><i class="fa fa-hashtag"></i> Variable Name</label>
+        <input type="text" class="data" data-name="name" placeholder="Name"/>
+        <label><i class="fa fa-sort-numeric-asc"></i> Index (optional)</label>
+        <input type="text" class="data" data-name="index" placeholder="Index"/>
+        <label><i class="fa fa-microchip"></i> Update Type</label>
+        <div class="variable-update-type">
+          <a href="#" data-type="set" class="selected">=</a>
+          <a href="#" data-type="plus">+</a>
+          <a href="#" data-type="minus">-</a>
+          <a href="#" data-type="multiply">x</a>
+          <a href="#" data-type="divide">/</a>
+        </div>
+        <label><i class="fa fa-keyboard-o"></i> Value</label>
+        <input type="text" class="data" data-name="value" placeholder="Value"/>
+      </div>
+      <div class="footer">
+        <a href="#" class="add-node" data-port="out1">
+          <i class="fa fa-code-fork"></i>
+        </a>
+      </div>
     </template>
     <template id="setTpl">
       <input type="text" class="name" placeholder="Variable" />
@@ -68,7 +85,7 @@
       <div id="popupMenu" class="large">
         <a href="#" id="createText" data-type="text"><i class="fa fa-comment"></i></a>
         <a href="#" id="createSkill" data-type="skill"><i class="fa fa-check-square-o"></i></a>
-        <a href="#" id="createAnother"><i class="fa fa-comment"></i></a>
+        <a href="#" id="createVariable" data-type="variable"><i class="fa fa-file-code-o"></i></a>
         <a href="#" id="createLast"><i class="fa fa-comment"></i></a>
       </div>
     </div>
