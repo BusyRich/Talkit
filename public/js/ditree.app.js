@@ -22,11 +22,11 @@ function showAddMenu(evt) {
   addNodePopup
     .removeClass('large')
     .css({
-      width: selectedNode.attributes.size.width,
+      width: elm.width(),
       height: elmHeight,
       lineHeight: elmHeight + 'px'
     })
-    .css(elm.parent().offset())
+    .css(elm.offset())
     .slideDown(200);
 
   evt.preventDefault();

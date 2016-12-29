@@ -72,15 +72,26 @@
     </template>
     <template id="choiceTpl">
       <div class="node-content">
-        <label><i class="fa fa-user"></i> Actor</label>
-        <input type="text" class="data" data-name="actor" placeholder="Name Here"/>
-        <a href="#" class="add-choice">Add</a>
-        <div class="choices"></div>
+        <p class="actor">
+          <label><i class="fa fa-user"></i> Actor</label>
+          <input type="text" class="data" data-name="actor" placeholder="Name Here"/>
+        </p>
+        
+        <div class="choices">
+          <label>
+            <i class="fa fa-list-ol"></i> Choices
+            <div class="actions">
+              <a href="#" class="add-choice"><i class="fa fa-plus"></i></a>
+              <a href="#" class="remove-choice"><i class="fa fa-minus"></i></a>
+            </div>
+          </label>
+        </div>
       </div>
     </template>
     <template id="choiceItemTpl">
       <div class="choice choice{{index}}" data-index="{{index}}">
-        <label><i class="fa fa-commenting"></i> Dialog</label>
+        <label class="choice-label">Choice {{letter}}</label>
+        <label class="dialog-label"><i class="fa fa-commenting"></i> Dialog</label>
         <textarea type="text" class="data" data-name="text{{index}}" placeholder="I should say something..."></textarea>
         <a href="#" class="add-node" data-port="out{{index}}">
           <i class="fa fa-code-fork"></i>

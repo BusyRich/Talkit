@@ -222,13 +222,15 @@ joint.shapes.ditree.ChoiceView = joint.shapes.ditree.TextView.extend({
   initialize: function() {
     joint.shapes.ditree.TextView.prototype.initialize.apply(this, arguments);
 
-    //remove the default outgoing port.
+    // Remove the default outgoing port. It will be readded when we 
+    // add the first choice.
     this.model.removePort('out1');
 
     this.choiceTpl = _.template($('#choiceItemTpl').html());
     this.choicesCon = this.$box.find('.choices');
 
     this.$box.find('.add-choice').click(_.bind(this.addChoice, this));
+    this.$box.find('.remove-choice').click(_.bind(this.removeChoice, this));
 
     this.addChoice();
 
@@ -237,7 +239,10 @@ joint.shapes.ditree.ChoiceView = joint.shapes.ditree.TextView.extend({
 
   addChoice: function(evt) {
     var idx = ++this.model.attributes.choices;
-    this.choicesCon.append(this.choiceTpl({index:idx}));
+    this.choicesCon.append(this.choiceTpl({
+      index: idx,
+      letter: String.fromCharCode(64 + idx)
+    }));
 
     this.$box.find('.choice' + idx + ' .add-node')
       .click(_.bind(this.showMenu, this));
@@ -257,6 +262,26 @@ joint.shapes.ditree.ChoiceView = joint.shapes.ditree.TextView.extend({
     if(evt) {
       evt.preventDefault();
     }
+  },
+
+  removeChoice: function(evt) {
+    var idx = this.model.attributes.choices;
+
+    if(idx > 0) {
+      this.$box.find('.choice' + idx).remove();
+      this.model.removePort('out' + idx);
+
+      if(idx > 1) {
+        this.model.resize(
+          this.model.attributes.size.width - this.widthIncrease,
+          this.model.attributes.size.height
+        );
+      }
+
+      this.model.attributes.choices--;
+    }
+    
+    evt.preventDefault();
   }
 });
 

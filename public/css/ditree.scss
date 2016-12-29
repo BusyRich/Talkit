@@ -251,6 +251,8 @@ $headerSize: 38px;
 	  height: 100%;
 	  font-size: 32px;
 	  text-align: center;
+    color: inherit;
+    background-color: rgba(255, 255, 255, 0.2);
 	}
 }
 
@@ -299,11 +301,49 @@ $headerSize: 38px;
 
   .node-content {
     padding-right: 0;
+
+    .actor {
+      width: 220px;
+    }
+
+    .choices {
+      .actions {
+        float: right;
+        margin-right: 16px;
+
+        a {
+          color: inherit;
+          float: right;
+          padding: 4px 8px;
+          margin-top: -4px;
+        }
+
+        a:hover {
+          background-color: rgba(255,255,255,0.4);
+        }
+      }
+
+      .choice {
+        width: 268px;
+        float: left;
+        margin-right: 16px;
+
+        .choice-label {
+          text-align: center;
+        }
+
+        .dialog-label {
+          margin: 0;
+        }
+
+        .add-node {
+          margin-top: 10px;
+          height: 48px;
+          line-height: 48px;
+        }
+      }
+    }
   }
   
-  .choice {
-    width: 268px;
-    float: left;
-    margin-right: 16px;
-  }
+  
 }
