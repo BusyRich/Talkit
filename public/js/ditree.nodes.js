@@ -178,8 +178,7 @@ joint.shapes.ditree.Variable = joint.shapes.devs.Model.extend({
     size: {
       width: 300,
       height: 400
-    },
-    outPorts: ['out1']
+    }
   }, joint.shapes.ditree.Text.prototype.defaults)
 });
 
@@ -203,3 +202,62 @@ joint.shapes.ditree.VariableView = joint.shapes.ditree.TextView.extend({
     evt.preventDefault();
   }
 });
+
+joint.shapes.ditree.Choice = joint.shapes.devs.Model.extend({
+  defaults: joint.util.deepSupplement({
+    type: 'ditree.Choice',
+    size: {
+      width: 300,
+      height: 400
+    },
+    choices: 0,
+  }, joint.shapes.ditree.Text.prototype.defaults)
+});
+
+joint.shapes.ditree.ChoiceView = joint.shapes.ditree.TextView.extend({
+  template: 'choiceTpl',
+  icon: 'list',
+  title: 'Choice',
+  color: '#55AA55',
+  initialize: function() {
+    joint.shapes.ditree.TextView.prototype.initialize.apply(this, arguments);
+
+    //remove the default outgoing port.
+    this.model.removePort('out1');
+
+    this.choiceTpl = _.template($('#choiceItemTpl').html());
+    this.choicesCon = this.$box.find('.choices');
+
+    this.$box.find('.add-choice').click(_.bind(this.addChoice, this));
+
+    this.addChoice();
+
+    this.widthIncrease = this.model.defaults.size.width - 16;
+  },
+
+  addChoice: function(evt) {
+    var idx = ++this.model.attributes.choices;
+    this.choicesCon.append(this.choiceTpl({index:idx}));
+
+    this.$box.find('.choice' + idx + ' .add-node')
+      .click(_.bind(this.showMenu, this));
+
+    this.model.addPort({
+      id: 'out' + idx,
+      group: 'out'
+    });
+
+    if(idx > 1) {
+      this.model.resize(
+        this.model.attributes.size.width + this.widthIncrease,
+        this.model.attributes.size.height
+      );
+    }
+    
+    if(evt) {
+      evt.preventDefault();
+    }
+  }
+});
+
+

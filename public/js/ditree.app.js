@@ -74,6 +74,9 @@ function add(type, source) {
     case 'variable':
       node = new joint.shapes.ditree.Variable(options);
       break;
+    case 'choice':
+      node = new joint.shapes.ditree.Choice(options);
+      break;
   }
 
   graph.addCells([node]);

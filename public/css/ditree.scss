@@ -294,3 +294,16 @@ $headerSize: 38px;
     }
   }
 }
+
+.ditree-choice {
+
+  .node-content {
+    padding-right: 0;
+  }
+  
+  .choice {
+    width: 268px;
+    float: left;
+    margin-right: 16px;
+  }
+}

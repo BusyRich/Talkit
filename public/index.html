@@ -70,9 +70,22 @@
         </a>
       </div>
     </template>
-    <template id="setTpl">
-      <input type="text" class="name" placeholder="Variable" />
-      <input type="text" class="value" placeholder="Value" />
+    <template id="choiceTpl">
+      <div class="node-content">
+        <label><i class="fa fa-user"></i> Actor</label>
+        <input type="text" class="data" data-name="actor" placeholder="Name Here"/>
+        <a href="#" class="add-choice">Add</a>
+        <div class="choices"></div>
+      </div>
+    </template>
+    <template id="choiceItemTpl">
+      <div class="choice choice{{index}}" data-index="{{index}}">
+        <label><i class="fa fa-commenting"></i> Dialog</label>
+        <textarea type="text" class="data" data-name="text{{index}}" placeholder="I should say something..."></textarea>
+        <a href="#" class="add-node" data-port="out{{index}}">
+          <i class="fa fa-code-fork"></i>
+        </a>
+      </div>
     </template>
   </head>
   <body>
@@ -86,7 +99,7 @@
         <a href="#" id="createText" data-type="text"><i class="fa fa-comment"></i></a>
         <a href="#" id="createSkill" data-type="skill"><i class="fa fa-check-square-o"></i></a>
         <a href="#" id="createVariable" data-type="variable"><i class="fa fa-file-code-o"></i></a>
-        <a href="#" id="createLast"><i class="fa fa-comment"></i></a>
+        <a href="#" id="createChoice" data-type="choice"><i class="fa fa-list"></i></a>
       </div>
     </div>
     <script src="js/ditree.js"></script>
