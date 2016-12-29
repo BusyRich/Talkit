@@ -1,12 +1,3 @@
-function getURLParameter(name) {
-  return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)')
-    .exec(location.search) || [, ""])[1].replace(/\+/g, '%20')) || null
-}
-
-function onError(e) {
-  console.log('Error', e);
-}
-
 var graph = new joint.dia.Graph(),
   addNodePopup = $('#popupMenu');
 
@@ -33,6 +24,8 @@ function showAddMenu(evt) {
 }
 
 function add(type, source) {
+  addNodePopup.slideUp(100);
+
   var node, options = {
     position: {
       x: 0,
@@ -92,7 +85,9 @@ function add(type, source) {
         port: 'in1'
       },
       attrs: {
-        '.marker-target': { d: 'M 20 0 L 0 10 L 20 20 z' }
+        '.marker-target': {
+          d: 'M 10 0 L 0 5 L 10 10 z'
+        }
       }
     }).addTo(graph);
   } else if (graph.attributes.cells.length == 1) {
@@ -100,8 +95,6 @@ function add(type, source) {
   }
 
   lastNode = node;
-
-  addNodePopup.slideUp(100);
 }
 
 $('#popupMenu a').click(function(evt) {
@@ -115,12 +108,14 @@ var paper = new joint.dia.Paper({
   el: $('#paper'),
   width: 16000,
   height: 8000,
+  gridSize: 25,
   model: graph,
-  gridSize: 8,
   defaultRouter: {
     name: 'manhattan',
     args: {
-      step: 1
+      step: 25,
+      startDirections: ['bottom'],
+      endDirections: ['top']
     }
   },
   interactive: false

@@ -31,7 +31,7 @@ joint.shapes.ditree.Text = joint.shapes.devs.Model.extend({
             position: {
               name: 'bottom',
               args: {
-                dy: 0
+                dy: -12
               }
             }
           }
